@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"io"
 	"log"
+	"net"
 	"net/http"
 	"os"
 )
@@ -31,6 +32,21 @@ func healthz(w http.ResponseWriter, r *http.Request) {
 	//设置ResponseBody
 	io.WriteString(w, "200")
 	//输出IP
-	fmt.Printf("request ip: %s; response status code: %s\n", r.Host, "???")
+	fmt.Printf("request ip: %s; response status code: %d\n", RemoteIp(r), http.StatusOK)
 	// to-do 获取状态码
+}
+
+func RemoteIp(req *http.Request) string {
+	remoteAddr := req.RemoteAddr
+	if ip := req.Header.Get("X-Real-IP"); ip != "" {
+		remoteAddr = ip
+	} else if ip = req.Header.Get("X-Forwarded-For"); ip != "" {
+		remoteAddr = ip
+	} else {
+		remoteAddr, _, _ = net.SplitHostPort(remoteAddr)
+	}
+	if remoteAddr == "::1" {
+		remoteAddr = "127.0.0.1"
+	}
+	return remoteAddr
 }
