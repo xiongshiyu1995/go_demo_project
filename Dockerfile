@@ -9,4 +9,4 @@ RUN mkdir logs
 #暴露端口
 EXPOSE 80
 #最终运行docker的命令
-CMD nohup ./go-http > logs/app.log 2>&1
+CMD ./go-http 2>&1
